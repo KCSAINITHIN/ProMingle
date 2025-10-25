@@ -870,9 +870,30 @@
             background: var(--primary);
             width: 0%;
         }
+
+        /* CORS Warning */
+        .cors-warning {
+            background: #ffeb3b;
+            color: #333;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 1px solid #ffc107;
+        }
+
+        .cors-warning.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- CORS Warning -->
+    <div class="cors-warning hidden" id="corsWarning">
+        <i class="fas fa-exclamation-triangle"></i>
+        CORS Issue Detected: Images may not upload properly from GitHub Pages. 
+        Please configure Firebase Storage CORS settings.
+    </div>
+
     <!-- Header -->
     <header>
         <div class="header-container">
@@ -1074,6 +1095,7 @@
         const storyUserAvatar = document.getElementById('storyUserAvatar');
         const storyViewerUsername = document.getElementById('storyViewerUsername');
         const storyViewerTime = document.getElementById('storyViewerTime');
+        const corsWarning = document.getElementById('corsWarning');
 
         let selectedPostMediaFile = null;
         let selectedPostMediaURL = null;
@@ -1086,18 +1108,15 @@
         let currentUserStories = [];
         let storyProgressInterval;
         let storyProgressBars = [];
+        let corsErrorDetected = false;
 
-        // Debug function to check Firebase connection
-        async function checkFirebaseConnection() {
-            try {
-                console.log("Checking Firebase connection...");
-                const testQuery = query(collection(db, 'posts'));
-                const snapshot = await getDocs(testQuery);
-                console.log("Firebase connection successful!");
-                return true;
-            } catch (error) {
-                console.error("Firebase connection failed:", error);
-                return false;
+        // Check for CORS issues
+        function checkCORS() {
+            const currentOrigin = window.location.origin;
+            if (currentOrigin.includes('github.io')) {
+                corsWarning.classList.remove('hidden');
+                corsErrorDetected = true;
+                console.warn('CORS Warning: App is running on GitHub Pages which may cause CORS issues with Firebase Storage');
             }
         }
 
@@ -1397,10 +1416,6 @@
             try {
                 console.log("Loading stories from Firestore...");
                 
-                // Only show stories from the last 24 hours
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                
                 const storiesQuery = query(
                     collection(db, 'stories'), 
                     orderBy('timestamp', 'desc')
@@ -1411,11 +1426,7 @@
                     const stories = [];
                     snapshot.forEach((doc) => {
                         const storyData = doc.data();
-                        // Filter stories from last 24 hours
-                        const storyDate = storyData.timestamp?.toDate();
-                        if (storyDate && storyDate > yesterday) {
-                            stories.push({ id: doc.id, ...storyData });
-                        }
+                        stories.push({ id: doc.id, ...storyData });
                     });
                     console.log(`Loaded ${stories.length} stories`);
                     currentStories = stories;
@@ -1427,7 +1438,6 @@
                             <i class="fas fa-exclamation-circle"></i>
                             <h3>Error Loading Stories</h3>
                             <p>Please check your connection and Firebase configuration</p>
-                            <p>Error: ${error.message}</p>
                         </div>
                     `;
                 });
@@ -1438,7 +1448,6 @@
                         <i class="fas fa-exclamation-circle"></i>
                         <h3>Error Loading Stories</h3>
                         <p>Please check your Firebase configuration</p>
-                        <p>Error: ${error.message}</p>
                     </div>
                 `;
             }
@@ -1465,7 +1474,6 @@
                             <i class="fas fa-exclamation-circle"></i>
                             <h3>Error Loading Posts</h3>
                             <p>Please check your connection and Firebase configuration</p>
-                            <p>Error: ${error.message}</p>
                             <button onclick="location.reload()">Retry</button>
                         </div>
                     `;
@@ -1477,7 +1485,6 @@
                         <i class="fas fa-exclamation-circle"></i>
                         <h3>Error Loading Posts</h3>
                         <p>Please check your Firebase configuration</p>
-                        <p>Error: ${error.message}</p>
                         <button onclick="location.reload()">Retry</button>
                     </div>
                 `;
@@ -1488,31 +1495,11 @@
         async function init() {
             console.log("Initializing ProMingle...");
             
-            // Check Firebase connection first
-            const isConnected = await checkFirebaseConnection();
+            // Check for CORS issues
+            checkCORS();
             
-            if (isConnected) {
-                loadStories();
-                loadPosts();
-            } else {
-                storiesContainer.innerHTML = `
-                    <div class="no-content" style="margin: 10px;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Firebase Connection Failed</h3>
-                        <p>Please check your Firebase configuration and internet connection</p>
-                        <button onclick="location.reload()">Retry Connection</button>
-                    </div>
-                `;
-                
-                postsContainer.innerHTML = `
-                    <div class="no-content">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Firebase Connection Failed</h3>
-                        <p>Please check your Firebase configuration and internet connection</p>
-                        <button onclick="location.reload()">Retry Connection</button>
-                    </div>
-                `;
-            }
+            loadStories();
+            loadPosts();
             
             // Modal controls
             createPostBtn.addEventListener('click', (e) => {
@@ -1760,37 +1747,46 @@
                 // Upload media to Firebase Storage
                 const fileExtension = selectedPostMediaFile.name.split('.').pop();
                 const storageRef = ref(storage, `posts/${Date.now()}_${username}.${fileExtension}`);
-                await uploadBytes(storageRef, selectedPostMediaFile);
-                const mediaURL = await getDownloadURL(storageRef);
+                
+                // Add CORS error handling
+                try {
+                    await uploadBytes(storageRef, selectedPostMediaFile);
+                    const mediaURL = await getDownloadURL(storageRef);
 
-                // Generate random avatar for user
-                const avatarURL = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+                    // Generate random avatar for user
+                    const avatarURL = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
 
-                // Add post to Firestore
-                await addDoc(collection(db, 'posts'), {
-                    username: username,
-                    avatar: avatarURL,
-                    mediaUrl: mediaURL,
-                    type: currentPostContentType,
-                    caption: caption,
-                    location: location || null,
-                    likes: 0,
-                    comments: 0,
-                    timestamp: serverTimestamp()
-                });
+                    // Add post to Firestore
+                    await addDoc(collection(db, 'posts'), {
+                        username: username,
+                        avatar: avatarURL,
+                        mediaUrl: mediaURL,
+                        type: currentPostContentType,
+                        caption: caption,
+                        location: location || null,
+                        likes: 0,
+                        comments: 0,
+                        timestamp: serverTimestamp()
+                    });
 
-                // Close modal and reset form
-                postingOverlay.classList.remove('active');
-                postModal.classList.remove('active');
-                resetPostForm();
+                    // Close modal and reset form
+                    postingOverlay.classList.remove('active');
+                    postModal.classList.remove('active');
+                    resetPostForm();
 
-                // Show success message
-                alert('Post shared successfully! 🎉');
+                    // Show success message
+                    alert('Post shared successfully! 🎉');
+                } catch (storageError) {
+                    if (storageError.code === 'storage/cors-unsupported') {
+                        throw new Error('CORS Error: Cannot upload files from GitHub Pages. Please configure Firebase Storage CORS settings.');
+                    }
+                    throw storageError;
+                }
 
             } catch (error) {
                 console.error('Error creating post:', error);
                 postingOverlay.classList.remove('active');
-                alert('Error sharing post. Please try again. Error: ' + error.message);
+                alert('Error sharing post: ' + error.message);
             }
         }
 
@@ -1809,33 +1805,42 @@
                 // Upload media to Firebase Storage
                 const fileExtension = selectedStoryMediaFile.name.split('.').pop();
                 const storageRef = ref(storage, `stories/${Date.now()}_${username}.${fileExtension}`);
-                await uploadBytes(storageRef, selectedStoryMediaFile);
-                const mediaURL = await getDownloadURL(storageRef);
+                
+                // Add CORS error handling
+                try {
+                    await uploadBytes(storageRef, selectedStoryMediaFile);
+                    const mediaURL = await getDownloadURL(storageRef);
 
-                // Generate random avatar for user
-                const avatarURL = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+                    // Generate random avatar for user
+                    const avatarURL = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
 
-                // Add story to Firestore
-                await addDoc(collection(db, 'stories'), {
-                    username: username,
-                    avatar: avatarURL,
-                    mediaUrl: mediaURL,
-                    type: currentStoryContentType,
-                    timestamp: serverTimestamp()
-                });
+                    // Add story to Firestore
+                    await addDoc(collection(db, 'stories'), {
+                        username: username,
+                        avatar: avatarURL,
+                        mediaUrl: mediaURL,
+                        type: currentStoryContentType,
+                        timestamp: serverTimestamp()
+                    });
 
-                // Close modal and reset form
-                postingOverlay.classList.remove('active');
-                storyModal.classList.remove('active');
-                resetStoryForm();
+                    // Close modal and reset form
+                    postingOverlay.classList.remove('active');
+                    storyModal.classList.remove('active');
+                    resetStoryForm();
 
-                // Show success message
-                alert('Story shared successfully! 🎉');
+                    // Show success message
+                    alert('Story shared successfully! 🎉');
+                } catch (storageError) {
+                    if (storageError.code === 'storage/cors-unsupported') {
+                        throw new Error('CORS Error: Cannot upload files from GitHub Pages. Please configure Firebase Storage CORS settings.');
+                    }
+                    throw storageError;
+                }
 
             } catch (error) {
                 console.error('Error creating story:', error);
                 postingOverlay.classList.remove('active');
-                alert('Error sharing story. Please try again. Error: ' + error.message);
+                alert('Error sharing story: ' + error.message);
             }
         }
 
