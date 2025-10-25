@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProMingle Splash</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(135deg, #4A00E0, #8E2DE2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: "Poppins", sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    .logo-img {
+      width: 130px;
+      height: 130px;
+      object-fit: contain;
+      margin-bottom: 15px;
+      opacity: 0;
+      animation: flipIn 2.5s ease-in-out forwards, glow 1.5s ease-in-out 2s infinite alternate;
+      transform-origin: center;
+    }
+
+    .logo-text {
+      font-size: 50px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      opacity: 0;
+      animation: slideUp 1.5s 1.2s forwards;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    }
+
+    .tagline {
+      margin-top: 8px;
+      font-size: 18px;
+      opacity: 0;
+      animation: fadeIn 1.5s 2s forwards;
+    }
+
+    .loader {
+      margin-top: 30px;
+      width: 45px;
+      height: 45px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* 🔥 Animations */
+    @keyframes flipIn {
+      0% {
+        opacity: 0;
+        transform: rotateY(90deg) scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: rotateY(0deg) scale(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: rotateY(0deg) scale(1);
+      }
+    }
+
+    @keyframes glow {
+      from {
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+      }
+      to {
+        filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.8));
+      }
+    }
+
+    @keyframes slideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Flipping Logo -->
+  <img src="pmlogo.png" alt="ProMingle Logo" class="logo-img">
+
+  <!-- App Name -->
+  <div class="logo-text">ProMingle</div>
+
+  <!-- Tagline -->
+  <p class="tagline">Connect • Collaborate • Grow</p>
+
+  <!-- Loader -->
+  <div class="loader"></div>
+
+  <script>
+    // Redirect to login page after 3 seconds
+    setTimeout(() => {
+      window.location.href = "login.html"; // Change to your next page if needed
+    }, 3000);
+  </script>
+</body>
+</html>

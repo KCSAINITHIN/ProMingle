@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProMingle - Connect & Network</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4A00E0;
+            --accent: #FF6B8B;
+            --success: #00D2AA;
+            --warning: #FFD166;
+            --apple: #000000;
+            --google: #4285F4;
+            --text-light: #FFFFFF;
+            --text-dark: #2D3748;
+            --bg-light: #FFFFFF;
+            --bg-dark: #0F172A;
+            --card-light: #F8FAFC;
+            --card-dark: #1E293B;
+            --glass-light: rgba(255, 255, 255, 0.1);
+            --glass-dark: rgba(15, 23, 42, 0.8);
+            --glass-border-light: rgba(255, 255, 255, 0.2);
+            --glass-border-dark: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: var(--bg-light);
+            --bg-secondary: var(--card-light);
+            --text-primary: var(--text-dark);
+            --text-secondary: #4A5568;
+            --glass: var(--glass-light);
+            --glass-border: var(--glass-border-light);
+            --card-bg: var(--card-light);
+            --card-border: #E2E8F0;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: var(--bg-dark);
+            --bg-secondary: var(--card-dark);
+            --text-primary: var(--text-light);
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --glass: var(--glass-dark);
+            --glass-border: var(--glass-border-dark);
+            --card-bg: var(--card-dark);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        [data-theme="light"] body::before {
+            opacity: 0.05;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Info Panel - Scrolling Content */
+        .info-panel {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .info-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .info-panel::-webkit-scrollbar-track {
+            background: var(--glass);
+            border-radius: 10px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-top: 10px;
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 12px;
+            object-fit: contain;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 5px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .section p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, rgba(138, 43, 226, 0.2) 0%, rgba(255, 107, 139, 0.2) 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card i {
+            font-size: 20px;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-card h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            font-size: 13px;
+            margin-bottom: 0;
+            line-height: 1.5;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 30px 0;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 15px 10px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent);
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .testimonial {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid var(--card-border);
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .author-info h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .author-info p {
+            font-size: 12px;
+            margin-bottom: 0;
+            color: var(--text-secondary);
+        }
+
+        /* Auth Panel */
+        .auth-panel {
+            width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            border-top: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 10;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .auth-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+            border-radius: 16px;
+            object-fit: contain;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 8px;
+        }
+
+        .auth-header h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            font-size: 16px;
+            color: var(--text-primary);
+            transition: all 0.3s;
+            background: var(--card-bg);
+            -webkit-appearance: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255, 107, 139, 0.2);
+            outline: none;
+        }
+
+        .input-group input:focus + i {
+            color: var(--accent);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+            min-height: 48px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 40%;
+            height: 1px;
+            background: var(--card-border);
+        }
+
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: 40%;
+            height: 1px;
+            background: var(--card-border);
+        }
+
+        .social-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            padding: 14px;
+            border: 1px solid;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 15px;
+            min-height: 48px;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-btn i {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .apple-btn {
+            background: var(--apple);
+            color: white;
+            border-color: var(--apple);
+        }
+
+        .apple-btn:hover {
+            background: #333;
+            border-color: #333;
+        }
+
+        .google-btn {
+            background: var(--google);
+            color: white;
+            border-color: var(--google);
+        }
+
+        .google-btn:hover {
+            background: #3367D6;
+            border-color: #3367D6;
+        }
+
+        .legal-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legal-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .legal-link:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .terms {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .terms a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+            padding: 20px;
+        }
+
+        .modal-content {
+            position: relative;
+            background: var(--bg-primary);
+            padding: 25px;
+            border-radius: 12px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-primary);
+            padding: 10px 0;
+            z-index: 1;
+        }
+
+        .modal-header h2 {
+            color: var(--text-primary);
+            font-size: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-modal:hover {
+            color: var(--accent);
+        }
+
+        .modal-body {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .modal-body h3 {
+            color: var(--text-primary);
+            margin: 15px 0 8px;
+            font-size: 16px;
+        }
+
+        .modal-body p {
+            margin-bottom: 12px;
+        }
+
+        .modal-body ul {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            padding: 12px 15px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-100px);
+            transition: transform 0.5s ease;
+            z-index: 1000;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 8px 0;
+        }
+
+        .loading-spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--accent);
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Floating elements - reduced for mobile performance */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1) 0%, rgba(255, 107, 139, 0.1) 100%);
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+            }
+        }
+
+        /* Tablet and Desktop Styles */
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+            }
+            
+            .info-panel {
+                height: 100vh;
+                position: sticky;
+                top: 0;
+                padding: 40px;
+            }
+            
+            .auth-panel {
+                width: 450px;
+                padding: 60px 40px;
+                box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+                border-left: 1px solid var(--glass-border);
+                border-top: none;
+            }
+            
+            .features {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .section h2 {
+                font-size: 28px;
+            }
+            
+            .section p {
+                font-size: 15px;
+            }
+            
+            .notification {
+                left: auto;
+                right: 20px;
+                width: auto;
+                max-width: 350px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .section h2 {
+                font-size: 32px;
+            }
+            
+            .section p {
+                font-size: 16px;
+            }
+            
+            .features {
+                gap: 25px;
+            }
+            
+            .feature-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </div>
+    
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <div class="container">
+        <div class="info-panel" id="infoPanel">
+            <div class="logo">
+                <img src="pmlogo.png" alt="ProMingle Logo" class="logo-img" onerror="this.style.display='none'">
+                <h1>ProMingle</h1>
+            </div>
+            
+            <div class="section visible" id="section1">
+                <h2>Connect with Professionals Worldwide</h2>
+                <p>Welcome to <span class="highlight">ProMingle</span>, the modern platform designed to help professionals like you build meaningful connections, share insights, and accelerate career growth.</p>
+                <p>Whether you're looking for mentors, collaborators, or new opportunities, our intelligent matching system connects you with the right people in your industry.</p>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-number">50K+</span>
+                        <span class="stat-label">Active Members</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">120+</span>
+                        <span class="stat-label">Countries</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">5K+</span>
+                        <span class="stat-label">Success Stories</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section" id="section2">
+                <h2>Why Professionals Choose ProMingle</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Smart Matching</h3>
+                        <p>Our AI-powered algorithm connects you with professionals who share your interests, goals, and industry focus.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Community Groups</h3>
+                        <p>Join specialized groups based on your industry, interests, or career stage to share knowledge and opportunities.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Exclusive Events</h3>
+                        <p>Access virtual and in-person events featuring industry leaders, workshops, and networking sessions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-rocket"></i>
+                        <h3>Career Growth</h3>
+                        <p>Find mentorship, collaboration opportunities, and career advancement resources tailored to your goals.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="auth-panel">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <img src="pmlogo.png" alt="ProMingle Logo" class="auth-logo" onerror="this.style.display='none'">
+                    <h2>Join ProMingle</h2>
+                    <p>Start building your professional network today</p>
+                </div>
+                
+                <form id="authForm">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="Enter your email" required autocomplete="email">
+                    </div>
+                    <div class="error-message" id="email-error"></div>
+                    
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div> Processing...
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="authButton">
+                        Continue with Email
+                    </button>
+                </form>
+                
+                <div class="divider">or continue with</div>
+                
+                <div class="social-auth">
+                    <button class="social-btn apple-btn" id="appleAuth">
+                        <i class="fab fa-apple"></i> Sign in with Apple
+                    </button>
+                    <button class="social-btn google-btn" id="googleAuth">
+                        <i class="fab fa-google"></i> Sign in with Google
+                    </button>
+                </div>
+                
+                <div class="legal-links">
+                    <a class="legal-link" id="termsLink">Terms of Service</a>
+                    <a class="legal-link" id="privacyLink">Privacy Policy</a>
+                </div>
+                
+                <div class="terms">
+                    By continuing, you agree to our <a id="termsLink2">Terms of Service</a> and <a id="privacyLink2">Privacy Policy</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terms of Service Modal -->
+    <div class="modal" id="termsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Terms of Service</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>1. Acceptance of Terms</h3>
+                <p>By accessing and using ProMingle, you accept and agree to be bound by the terms and provision of this agreement.</p>
+                
+                <h3>2. Use License</h3>
+                <p>Permission is granted to temporarily use ProMingle for personal, non-commercial transitory viewing only.</p>
+                
+                <h3>3. User Account</h3>
+                <p>When you create an account with us, you must provide information that is accurate, complete, and current at all times.</p>
+                
+                <h3>4. Content</h3>
+                <p>Our Service allows you to post, link, store, share and otherwise make available certain information, text, graphics, videos, or other material.</p>
+                
+                <h3>5. Termination</h3>
+                <p>We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Privacy Policy Modal -->
+    <div class="modal" id="privacyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Privacy Policy</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>1. Information We Collect</h3>
+                <p>We collect information you provide directly to us, such as when you create an account, update your profile, or use our services.</p>
+                
+                <h3>2. How We Use Your Information</h3>
+                <p>We use the information we collect to provide, maintain, and improve our services, develop new ones, and protect ProMingle and our users.</p>
+                
+                <h3>3. Information Sharing</h3>
+                <p>We do not sell, trade, or otherwise transfer to outside parties your personally identifiable information.</p>
+                
+                <h3>4. Security</h3>
+                <p>We take reasonable measures to help protect information about you from loss, theft, misuse and unauthorized access.</p>
+                
+                <h3>5. Your Rights</h3>
+                <p>You have the right to access, correct, or delete your personal information. You can also object to or restrict certain processing of your data.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <div id="notificationMessage">Welcome to ProMingle!</div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDpu5J7MrI3TP8ePcdFFf-Pg9nzVHvfQPM",
+            authDomain: "promingle-88512.firebaseapp.com",
+            projectId: "promingle-88512",
+            storageBucket: "promingle-88512.firebasestorage.app",
+            messagingSenderId: "980797680689",
+            appId: "1:980797680689:web:d6aea6420032eac1f43910",
+            measurementId: "G-3MV79YGZXB"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const analytics = firebase.analytics();
+
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+
+        // Check for saved theme or prefer color scheme
+        const savedTheme = localStorage.getItem('theme') || 
+                          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        body.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+            
+            showNotification(`Switched to ${newTheme} mode`);
+        });
+
+        function updateThemeIcon(theme) {
+            themeIcon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Create floating elements (reduced for mobile)
+        const floatingContainer = document.getElementById('floatingElements');
+        for (let i = 0; i < 8; i++) { // Reduced from 15 for mobile performance
+            const element = document.createElement('div');
+            element.classList.add('floating-element');
+            
+            const size = Math.random() * 60 + 20; // Smaller elements
+            const left = Math.random() * 100;
+            const animationDuration = Math.random() * 25 + 15;
+            
+            element.style.width = `${size}px`;
+            element.style.height = `${size}px`;
+            element.style.left = `${left}%`;
+            element.style.animationDuration = `${animationDuration}s`;
+            element.style.animationDelay = `${Math.random() * 10}s`;
+            element.style.opacity = Math.random() * 0.1 + 0.05;
+            
+            floatingContainer.appendChild(element);
+        }
+
+        // Scroll animation for sections
+        const sections = document.querySelectorAll('.section');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // Modal functionality
+        const termsModal = document.getElementById('termsModal');
+        const privacyModal = document.getElementById('privacyModal');
+        const closeButtons = document.querySelectorAll('.close-modal');
+
+        // Open modals
+        document.getElementById('termsLink').addEventListener('click', () => {
+            termsModal.style.display = 'block';
+        });
+        
+        document.getElementById('termsLink2').addEventListener('click', () => {
+            termsModal.style.display = 'block';
+        });
+        
+        document.getElementById('privacyLink').addEventListener('click', () => {
+            privacyModal.style.display = 'block';
+        });
+        
+        document.getElementById('privacyLink2').addEventListener('click', () => {
+            privacyModal.style.display = 'block';
+        });
+
+        // Close modals
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                termsModal.style.display = 'none';
+                privacyModal.style.display = 'none';
+            });
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === termsModal) {
+                termsModal.style.display = 'none';
+            }
+            if (e.target === privacyModal) {
+                privacyModal.style.display = 'none';
+            }
+        });
+
+        // Show loading state
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Show error message
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // Hide error message
+        function hideError(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        // Notification system
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            const messageElement = document.getElementById('notificationMessage');
+            
+            messageElement.textContent = message;
+            notification.style.background = isError 
+                ? 'rgba(239, 68, 68, 0.8)' 
+                : 'var(--glass)';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Email/Password Authentication
+        document.getElementById('authForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            showLoading();
+            hideError('email-error');
+            
+            const email = document.getElementById('email').value;
+            
+            // Simple validation
+            if (!validateEmail(email)) {
+                hideLoading();
+                showError('email-error', 'Please enter a valid email address');
+                return;
+            }
+            
+            try {
+                // Check if user exists (this is a simplified approach)
+                // In a real app, you might use Firebase Admin SDK on backend
+                const methods = await auth.fetchSignInMethodsForEmail(email);
+                
+                if (methods.length > 0) {
+                    // User exists - send sign in link
+                    await auth.sendSignInLinkToEmail(email, {
+                        url: window.location.origin + "/home.html",
+                        handleCodeInApp: true
+                    });
+                    showNotification(`Sign-in link sent to ${email}. Please check your email.`);
+                } else {
+                    // New user - create account with email link
+                    await auth.sendSignInLinkToEmail(email, {
+                        url: window.location.origin + "/home.html",
+                        handleCodeInApp: true
+                    });
+                    // Save email to localStorage for completion
+                    window.localStorage.setItem('emailForSignIn', email);
+                    showNotification(`Welcome! Verification link sent to ${email}. Please check your email.`);
+                }
+                
+                // Log event
+                analytics.logEvent('email_auth_initiated', { email: email });
+                
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showNotification(error.message, true);
+            } finally {
+                hideLoading();
+                document.getElementById('authForm').reset();
+            }
+        });
+
+        // Check for email link sign-in
+        if (auth.isSignInWithEmailLink(window.location.href)) {
+            let email = window.localStorage.getItem('emailForSignIn');
+            if (!email) {
+                email = window.prompt('Please provide your email for confirmation');
+            }
+            
+            if (email) {
+                showLoading();
+                auth.signInWithEmailLink(email, window.location.href)
+                    .then((result) => {
+                        window.localStorage.removeItem('emailForSignIn');
+                        showNotification('Successfully signed in! Redirecting to home page...');
+                        // Redirect to home.html
+                        setTimeout(() => {
+                            window.location.href = 'home.html';
+                        }, 2000);
+                    })
+                    .catch((error) => {
+                        console.error('Error signing in:', error);
+                        showNotification(error.message, true);
+                    })
+                    .finally(() => {
+                        hideLoading();
+                    });
+            }
+        }
+
+        // Apple Authentication
+        document.getElementById('appleAuth').addEventListener('click', async function() {
+            showLoading();
+            
+            try {
+                const provider = new firebase.auth.OAuthProvider('apple.com');
+                
+                // Add scopes
+                provider.addScope('email');
+                provider.addScope('name');
+                
+                // For web, you need to use signInWithPopup or signInWithRedirect
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                // If it's a new user, create their profile
+                if (result.additionalUserInfo.isNewUser) {
+                    await db.collection('users').doc(user.uid).set({
+                        name: user.displayName || 'Apple User',
+                        email: user.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                analytics.logEvent('sign_up', { method: 'apple' });
+                showNotification('Successfully signed in! Redirecting to home page...');
+                
+                // Redirect to home.html
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Apple auth error:', error);
+                showNotification(error.message, true);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Google Authentication
+        document.getElementById('googleAuth').addEventListener('click', async function() {
+            showLoading();
+            
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                
+                // Add scopes
+                provider.addScope('email');
+                provider.addScope('profile');
+                
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                // If it's a new user, create their profile
+                if (result.additionalUserInfo.isNewUser) {
+                    await db.collection('users').doc(user.uid).set({
+                        name: user.displayName,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                analytics.logEvent('sign_up', { method: 'google' });
+                showNotification('Successfully signed in! Redirecting to home page...');
+                
+                // Redirect to home.html
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Google auth error:', error);
+                showNotification(error.message, true);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Email validation
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // Auth state observer
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                console.log('User is logged in:', user);
+                // If user is already logged in, redirect to home.html
+                if (window.location.pathname !== '/home.html') {
+                    window.location.href = 'home.html';
+                }
+            } else {
+                // User is signed out
+                console.log('User is logged out');
+            }
+        });
+
+        // Initial welcome message
+        setTimeout(() => {
+            showNotification('Welcome to ProMingle! Start building your professional network today.');
+        }, 1000);
+    </script>
+</body>
+</html>

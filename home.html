@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProMingle - Professional Networking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --primary: #E1306C;
+            --secondary: #833AB4;
+            --accent: #405DE6;
+            --light: #F8F9FA;
+            --dark: #262626;
+            --gray: #8E8E8E;
+            --border: #DBDBDB;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(219, 219, 219, 0.5);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .header-icons i {
+            font-size: 24px;
+            color: var(--dark);
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .header-icons i:hover {
+            transform: scale(1.1);
+            color: var(--primary);
+        }
+
+        /* Stories Section */
+        .stories-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(219, 219, 219, 0.5);
+            padding: 20px 0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stories {
+            display: flex;
+            gap: 18px;
+            padding: 0 20px;
+        }
+
+        .story {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .story:hover {
+            transform: translateY(-5px);
+        }
+
+        .story-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(225, 48, 108, 0.3);
+        }
+
+        .story-avatar img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
+        }
+
+        .story-username {
+            font-size: 12px;
+            margin-top: 8px;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .add-story {
+            position: relative;
+        }
+
+        .add-story-icon {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--accent);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border: 3px solid white;
+        }
+
+        /* Posts Section */
+        .posts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 0 10px;
+        }
+
+        .post {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 18px;
+        }
+
+        .post-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .post-user-info {
+            flex: 1;
+        }
+
+        .post-username {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .post-location {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .post-options {
+            font-size: 20px;
+            color: var(--dark);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .post-options:hover {
+            color: var(--primary);
+        }
+
+        .post-image {
+            width: 100%;
+            max-height: 600px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .post-video {
+            width: 100%;
+            max-height: 600px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 18px;
+            font-size: 26px;
+        }
+
+        .post-actions-left {
+            display: flex;
+            gap: 18px;
+        }
+
+        .post-actions i {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .post-actions i:hover {
+            transform: scale(1.15);
+        }
+
+        .post-actions i.liked {
+            color: var(--primary);
+            animation: likeAnimation 0.4s ease;
+        }
+
+        @keyframes likeAnimation {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .post-likes {
+            font-weight: 600;
+            font-size: 14px;
+            padding: 0 18px;
+            margin-bottom: 8px;
+        }
+
+        .post-caption {
+            padding: 0 18px 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .post-caption .username {
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .post-comments {
+            padding: 0 18px 12px;
+            color: var(--gray);
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .post-comments:hover {
+            color: var(--dark);
+        }
+
+        .post-time {
+            padding: 0 18px 12px;
+            color: var(--gray);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .add-comment {
+            display: flex;
+            padding: 15px 18px;
+            border-top: 1px solid var(--border);
+            align-items: center;
+        }
+
+        .add-comment input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .add-comment button {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .add-comment button:hover {
+            color: var(--primary);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(219, 219, 219, 0.5);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--dark);
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s;
+            padding: 5px 10px;
+        }
+
+        .nav-item i {
+            font-size: 24px;
+            margin-bottom: 4px;
+            transition: transform 0.2s;
+        }
+
+        .nav-item:hover i {
+            transform: scale(1.15);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item.active i {
+            color: var(--primary);
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* No content message */
+        .no-content {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            margin: 20px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-content i {
+            font-size: 64px;
+            color: var(--gray);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .no-content h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .no-content p {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .no-content button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .no-content button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Animation for new content */
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .post, .story {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        /* Hide scrollbar for stories */
+        .stories-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .stories-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .create-post-modal, .create-story-modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--dark);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            background: var(--light);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(225, 48, 108, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .upload-area.has-image {
+            padding: 0;
+            border: none;
+        }
+
+        .preview-image {
+            width: 100%;
+            border-radius: 12px;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .preview-video {
+            width: 100%;
+            border-radius: 12px;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .post-button, .story-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .post-button:hover, .story-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(225, 48, 108, 0.4);
+        }
+
+        .post-button:active, .story-button:active {
+            transform: translateY(0);
+        }
+
+        .post-button:disabled, .story-button:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .posting-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .posting-overlay.active {
+            display: flex;
+        }
+
+        .posting-message {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .posting-message .spinner {
+            margin: 0 auto 15px;
+        }
+
+        /* Content type selector */
+        .content-type-selector {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .content-type-option {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: var(--light);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .content-type-option.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        /* Story Viewer */
+        .story-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .story-viewer.active {
+            display: flex;
+        }
+
+        .story-progress {
+            display: flex;
+            padding: 10px;
+            gap: 5px;
+        }
+
+        .story-progress-bar {
+            flex: 1;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .story-progress-fill {
+            height: 100%;
+            background: white;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .story-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .story-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .story-video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .story-nav {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 50%;
+            cursor: pointer;
+        }
+
+        .story-nav.prev {
+            left: 0;
+        }
+
+        .story-nav.next {
+            right: 0;
+        }
+
+        .story-header {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+        }
+
+        .story-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid white;
+        }
+
+        .story-user-info {
+            flex: 1;
+        }
+
+        .story-username {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .story-time {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .story-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Video player controls */
+        .video-container {
+            position: relative;
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .video-container:hover .video-controls {
+            opacity: 1;
+        }
+
+        .video-controls button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .video-progress {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .video-progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">ProMingle</div>
+            <div class="header-icons">
+                <i class="far fa-heart"></i>
+                <i class="far fa-paper-plane"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Stories -->
+        <div class="stories-container">
+            <div class="stories" id="storiesContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading stories...
+                </div>
+            </div>
+        </div>
+
+        <!-- Posts -->
+        <div class="posts-container" id="postsContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading posts...
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-page="home">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-search"></i>
+            <span>Search</span>
+        </a>
+        <a href="#" class="nav-item" id="createPostBtn">
+            <i class="fas fa-plus-square"></i>
+            <span>Post</span>
+        </a>
+        <a href="#" class="nav-item" id="createStoryBtn">
+            <i class="fas fa-plus-circle"></i>
+            <span>Story</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Create Post Modal -->
+    <div class="modal-overlay" id="postModal">
+        <div class="create-post-modal">
+            <div class="modal-header">
+                <h2>Create New Post</h2>
+                <button class="modal-close" id="closePostModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="createPostForm">
+                    <div class="content-type-selector">
+                        <div class="content-type-option active" data-type="image">Image</div>
+                        <div class="content-type-option" data-type="video">Video</div>
+                    </div>
+                    
+                    <div class="upload-area" id="postUploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload an image</p>
+                        <input type="file" id="postMediaInput" accept="image/*,video/*" style="display: none;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" placeholder="Enter your username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="caption">Caption</label>
+                        <textarea id="caption" placeholder="Write a caption..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location (Optional)</label>
+                        <input type="text" id="location" placeholder="Add location">
+                    </div>
+
+                    <button type="submit" class="post-button">Share Post</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Story Modal -->
+    <div class="modal-overlay" id="storyModal">
+        <div class="create-story-modal">
+            <div class="modal-header">
+                <h2>Create New Story</h2>
+                <button class="modal-close" id="closeStoryModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="createStoryForm">
+                    <div class="content-type-selector">
+                        <div class="content-type-option active" data-type="image">Image</div>
+                        <div class="content-type-option" data-type="video">Video</div>
+                    </div>
+                    
+                    <div class="upload-area" id="storyUploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload an image</p>
+                        <input type="file" id="storyMediaInput" accept="image/*,video/*" style="display: none;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="storyUsername">Username</label>
+                        <input type="text" id="storyUsername" placeholder="Enter your username" required>
+                    </div>
+
+                    <button type="submit" class="story-button">Share Story</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Story Viewer -->
+    <div class="story-viewer" id="storyViewer">
+        <div class="story-progress" id="storyProgress"></div>
+        <div class="story-content" id="storyContent">
+            <div class="story-header">
+                <img src="" alt="" class="story-user-avatar" id="storyUserAvatar">
+                <div class="story-user-info">
+                    <div class="story-username" id="storyViewerUsername"></div>
+                    <div class="story-time" id="storyViewerTime"></div>
+                </div>
+                <button class="story-close" id="closeStoryViewer">&times;</button>
+            </div>
+            <div class="story-nav prev" id="prevStory"></div>
+            <div class="story-nav next" id="nextStory"></div>
+        </div>
+    </div>
+
+    <!-- Posting Overlay -->
+    <div class="posting-overlay" id="postingOverlay">
+        <div class="posting-message">
+            <div class="spinner"></div>
+            <h3>Posting...</h3>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, where, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDpu5J7MrI3TP8ePcdFFf-Pg9nzVHvfQPM",
+            authDomain: "promingle-88512.firebaseapp.com",
+            projectId: "promingle-88512",
+            storageBucket: "promingle-88512.firebasestorage.app",
+            messagingSenderId: "980797680689",
+            appId: "1:980797680689:web:d6aea6420032eac1f43910",
+            measurementId: "G-3MV79YGZXB"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // DOM elements
+        const storiesContainer = document.getElementById('storiesContainer');
+        const postsContainer = document.getElementById('postsContainer');
+        const postModal = document.getElementById('postModal');
+        const storyModal = document.getElementById('storyModal');
+        const closePostModalBtn = document.getElementById('closePostModal');
+        const closeStoryModalBtn = document.getElementById('closeStoryModal');
+        const createPostBtn = document.getElementById('createPostBtn');
+        const createStoryBtn = document.getElementById('createStoryBtn');
+        const postUploadArea = document.getElementById('postUploadArea');
+        const storyUploadArea = document.getElementById('storyUploadArea');
+        const postMediaInput = document.getElementById('postMediaInput');
+        const storyMediaInput = document.getElementById('storyMediaInput');
+        const createPostForm = document.getElementById('createPostForm');
+        const createStoryForm = document.getElementById('createStoryForm');
+        const postingOverlay = document.getElementById('postingOverlay');
+        const storyViewer = document.getElementById('storyViewer');
+        const storyProgress = document.getElementById('storyProgress');
+        const storyContent = document.getElementById('storyContent');
+        const closeStoryViewerBtn = document.getElementById('closeStoryViewer');
+        const prevStoryBtn = document.getElementById('prevStory');
+        const nextStoryBtn = document.getElementById('nextStory');
+        const storyUserAvatar = document.getElementById('storyUserAvatar');
+        const storyViewerUsername = document.getElementById('storyViewerUsername');
+        const storyViewerTime = document.getElementById('storyViewerTime');
+
+        let selectedPostMediaFile = null;
+        let selectedPostMediaURL = null;
+        let selectedStoryMediaFile = null;
+        let selectedStoryMediaURL = null;
+        let currentPostContentType = 'image';
+        let currentStoryContentType = 'image';
+        let currentStories = [];
+        let currentStoryIndex = 0;
+        let currentUserStories = [];
+        let storyProgressInterval;
+        let storyProgressBars = [];
+
+        // Format timestamp
+        function formatTime(timestamp) {
+            if (!timestamp) return 'Just now';
+            
+            const now = new Date();
+            const postDate = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const diffMs = now - postDate;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} minutes ago`;
+            if (diffHours < 24) return `${diffHours} hours ago`;
+            if (diffDays < 7) return `${diffDays} days ago`;
+            return postDate.toLocaleDateString();
+        }
+
+        // Render stories
+        function renderStories(stories) {
+            if (stories.length === 0) {
+                storiesContainer.innerHTML = `
+                    <div class="no-content" style="margin: 10px;">
+                        <i class="fas fa-camera"></i>
+                        <h3>No Stories Yet</h3>
+                        <p>Be the first to share a story!</p>
+                        <button onclick="document.getElementById('createStoryBtn').click()">Create Your First Story</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group stories by user
+            const storiesByUser = {};
+            stories.forEach(story => {
+                if (!storiesByUser[story.username]) {
+                    storiesByUser[story.username] = [];
+                }
+                storiesByUser[story.username].push(story);
+            });
+            
+            storiesContainer.innerHTML = '';
+            
+            // Add "Your Story" with plus icon
+            const yourStoryElement = document.createElement('div');
+            yourStoryElement.className = 'story add-story';
+            yourStoryElement.innerHTML = `
+                <div class="story-avatar">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=You" alt="Your Story">
+                    <div class="add-story-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </div>
+                <div class="story-username">Your Story</div>
+            `;
+            yourStoryElement.addEventListener('click', () => {
+                document.getElementById('createStoryBtn').click();
+            });
+            storiesContainer.appendChild(yourStoryElement);
+            
+            // Add other users' stories
+            Object.keys(storiesByUser).forEach(username => {
+                const userStories = storiesByUser[username];
+                const latestStory = userStories[0]; // Get the latest story
+                
+                const storyElement = document.createElement('div');
+                storyElement.className = 'story';
+                storyElement.innerHTML = `
+                    <div class="story-avatar">
+                        <img src="${latestStory.avatar || 'https://via.placeholder.com/150'}" alt="${username}" onerror="this.src='https://via.placeholder.com/150'">
+                    </div>
+                    <div class="story-username">${username}</div>
+                `;
+                
+                storyElement.addEventListener('click', () => {
+                    openStoryViewer(username, userStories);
+                });
+                
+                storiesContainer.appendChild(storyElement);
+            });
+        }
+
+        // Render posts
+        function renderPosts(posts) {
+            if (posts.length === 0) {
+                postsContainer.innerHTML = `
+                    <div class="no-content">
+                        <i class="fas fa-image"></i>
+                        <h3>No Posts Yet</h3>
+                        <p>Be the first to share something amazing!</p>
+                        <button onclick="document.getElementById('createPostBtn').click()">Create Your First Post</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            postsContainer.innerHTML = '';
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.dataset.id = post.id;
+                
+                let mediaElement = '';
+                if (post.type === 'video') {
+                    mediaElement = `
+                        <div class="video-container">
+                            <video class="post-video" controls>
+                                <source src="${post.mediaUrl}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    `;
+                } else {
+                    mediaElement = `<img src="${post.mediaUrl || 'https://via.placeholder.com/600'}" alt="Post image" class="post-image" onerror="this.src='https://via.placeholder.com/600'">`;
+                }
+                
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <img src="${post.avatar || 'https://via.placeholder.com/150'}" alt="${post.username}" class="post-avatar" onerror="this.src='https://via.placeholder.com/150'">
+                        <div class="post-user-info">
+                            <div class="post-username">${post.username || 'User'}</div>
+                            ${post.location ? `<div class="post-location">${post.location}</div>` : ''}
+                        </div>
+                        <div class="post-options">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                    </div>
+                    ${mediaElement}
+                    <div class="post-actions">
+                        <div class="post-actions-left">
+                            <i class="far fa-heart"></i>
+                            <i class="far fa-comment"></i>
+                            <i class="far fa-paper-plane"></i>
+                        </div>
+                        <i class="far fa-bookmark"></i>
+                    </div>
+                    <div class="post-likes">${(post.likes || 0).toLocaleString()} likes</div>
+                    <div class="post-caption">
+                        <span class="username">${post.username || 'User'}</span>${post.caption || ''}
+                    </div>
+                    ${post.comments ? `<div class="post-comments">View all ${post.comments} comments</div>` : ''}
+                    <div class="post-time">${formatTime(post.timestamp)}</div>
+                    <div class="add-comment">
+                        <input type="text" placeholder="Add a comment...">
+                        <button>Post</button>
+                    </div>
+                `;
+                postsContainer.appendChild(postElement);
+            });
+        }
+
+        // Open story viewer
+        function openStoryViewer(username, stories) {
+            currentUserStories = stories;
+            currentStoryIndex = 0;
+            
+            // Set user info
+            storyUserAvatar.src = stories[0].avatar || 'https://via.placeholder.com/150';
+            storyViewerUsername.textContent = username;
+            storyViewerTime.textContent = formatTime(stories[0].timestamp);
+            
+            // Create progress bars
+            storyProgress.innerHTML = '';
+            storyProgressBars = [];
+            
+            stories.forEach((story, index) => {
+                const progressBar = document.createElement('div');
+                progressBar.className = 'story-progress-bar';
+                progressBar.innerHTML = `<div class="story-progress-fill" id="storyProgressFill${index}"></div>`;
+                storyProgress.appendChild(progressBar);
+                storyProgressBars.push(document.getElementById(`storyProgressFill${index}`));
+            });
+            
+            // Show the first story
+            showStory(0);
+            
+            // Start progress animation
+            startStoryProgress();
+            
+            // Show the viewer
+            storyViewer.classList.add('active');
+        }
+
+        // Show specific story
+        function showStory(index) {
+            if (index < 0 || index >= currentUserStories.length) return;
+            
+            currentStoryIndex = index;
+            const story = currentUserStories[index];
+            
+            // Update user info
+            storyViewerTime.textContent = formatTime(story.timestamp);
+            
+            // Clear previous content
+            storyContent.innerHTML = `
+                <div class="story-header">
+                    <img src="${story.avatar || 'https://via.placeholder.com/150'}" alt="${story.username}" class="story-user-avatar" id="storyUserAvatar">
+                    <div class="story-user-info">
+                        <div class="story-username" id="storyViewerUsername">${story.username}</div>
+                        <div class="story-time" id="storyViewerTime">${formatTime(story.timestamp)}</div>
+                    </div>
+                    <button class="story-close" id="closeStoryViewer">&times;</button>
+                </div>
+                <div class="story-nav prev" id="prevStory"></div>
+                <div class="story-nav next" id="nextStory"></div>
+            `;
+            
+            // Add story content
+            let mediaElement;
+            if (story.type === 'video') {
+                mediaElement = document.createElement('video');
+                mediaElement.className = 'story-video';
+                mediaElement.src = story.mediaUrl;
+                mediaElement.controls = true;
+                mediaElement.autoplay = true;
+                mediaElement.addEventListener('ended', nextStory);
+            } else {
+                mediaElement = document.createElement('img');
+                mediaElement.className = 'story-image';
+                mediaElement.src = story.mediaUrl;
+                
+                // Auto-advance after 5 seconds for images
+                setTimeout(nextStory, 5000);
+            }
+            
+            storyContent.appendChild(mediaElement);
+            
+            // Add event listeners
+            document.getElementById('closeStoryViewer').addEventListener('click', closeStoryViewer);
+            document.getElementById('prevStory').addEventListener('click', prevStory);
+            document.getElementById('nextStory').addEventListener('click', nextStory);
+            
+            // Reset progress bars
+            resetProgressBars();
+        }
+
+        // Start story progress animation
+        function startStoryProgress() {
+            clearInterval(storyProgressInterval);
+            
+            storyProgressInterval = setInterval(() => {
+                if (currentStoryIndex < storyProgressBars.length) {
+                    const progressBar = storyProgressBars[currentStoryIndex];
+                    const currentWidth = parseFloat(progressBar.style.width) || 0;
+                    const newWidth = currentWidth + 0.5; // 0.5% per interval
+                    
+                    if (newWidth >= 100) {
+                        progressBar.style.width = '100%';
+                        nextStory();
+                    } else {
+                        progressBar.style.width = `${newWidth}%`;
+                    }
+                }
+            }, 50); // Update every 50ms for smooth animation
+        }
+
+        // Reset progress bars
+        function resetProgressBars() {
+            storyProgressBars.forEach((bar, index) => {
+                if (index < currentStoryIndex) {
+                    bar.style.width = '100%';
+                } else if (index === currentStoryIndex) {
+                    bar.style.width = '0%';
+                } else {
+                    bar.style.width = '0%';
+                }
+            });
+        }
+
+        // Next story
+        function nextStory() {
+            if (currentStoryIndex < currentUserStories.length - 1) {
+                showStory(currentStoryIndex + 1);
+            } else {
+                closeStoryViewer();
+            }
+        }
+
+        // Previous story
+        function prevStory() {
+            if (currentStoryIndex > 0) {
+                showStory(currentStoryIndex - 1);
+            }
+        }
+
+        // Close story viewer
+        function closeStoryViewer() {
+            clearInterval(storyProgressInterval);
+            storyViewer.classList.remove('active');
+        }
+
+        // Load stories from Firestore
+        async function loadStories() {
+            try {
+                // Only show stories from the last 24 hours
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                const storiesQuery = query(
+                    collection(db, 'stories'), 
+                    where('timestamp', '>=', yesterday),
+                    orderBy('timestamp', 'desc')
+                );
+                
+                // Real-time listener
+                onSnapshot(storiesQuery, (snapshot) => {
+                    const stories = [];
+                    snapshot.forEach((doc) => {
+                        stories.push({ id: doc.id, ...doc.data() });
+                    });
+                    currentStories = stories;
+                    renderStories(stories);
+                }, (error) => {
+                    console.error('Error loading stories:', error);
+                    storiesContainer.innerHTML = `
+                        <div class="no-content" style="margin: 10px;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>Error Loading Stories</h3>
+                            <p>Please check your connection</p>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading stories:', error);
+                storiesContainer.innerHTML = `
+                    <div class="no-content" style="margin: 10px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error Loading Stories</h3>
+                        <p>Please check your Firebase configuration</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load posts from Firestore
+        async function loadPosts() {
+            try {
+                const postsQuery = query(collection(db, 'posts'), orderBy('timestamp', 'desc'));
+                
+                // Real-time listener
+                onSnapshot(postsQuery, (snapshot) => {
+                    const posts = [];
+                    snapshot.forEach((doc) => {
+                        posts.push({ id: doc.id, ...doc.data() });
+                    });
+                    renderPosts(posts);
+                }, (error) => {
+                    console.error('Error loading posts:', error);
+                    postsContainer.innerHTML = `
+                        <div class="no-content">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>Error Loading Posts</h3>
+                            <p>Please check your connection</p>
+                            <button onclick="location.reload()">Retry</button>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                postsContainer.innerHTML = `
+                    <div class="no-content">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error Loading Posts</h3>
+                        <p>Please check your Firebase configuration</p>
+                        <button onclick="location.reload()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize the page
+        function init() {
+            loadStories();
+            loadPosts();
+            
+            // Modal controls
+            createPostBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                postModal.classList.add('active');
+            });
+
+            createStoryBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                storyModal.classList.add('active');
+            });
+
+            closePostModalBtn.addEventListener('click', () => {
+                postModal.classList.remove('active');
+                resetPostForm();
+            });
+
+            closeStoryModalBtn.addEventListener('click', () => {
+                storyModal.classList.remove('active');
+                resetStoryForm();
+            });
+
+            postModal.addEventListener('click', (e) => {
+                if (e.target === postModal) {
+                    postModal.classList.remove('active');
+                    resetPostForm();
+                }
+            });
+
+            storyModal.addEventListener('click', (e) => {
+                if (e.target === storyModal) {
+                    storyModal.classList.remove('active');
+                    resetStoryForm();
+                }
+            });
+
+            // Content type selection for posts
+            document.querySelectorAll('#postModal .content-type-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('#postModal .content-type-option').forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    currentPostContentType = option.dataset.type;
+                    
+                    // Update upload area text
+                    const uploadText = postUploadArea.querySelector('p');
+                    if (currentPostContentType === 'image') {
+                        uploadText.textContent = 'Click to upload an image';
+                        postMediaInput.accept = 'image/*';
+                    } else {
+                        uploadText.textContent = 'Click to upload a video';
+                        postMediaInput.accept = 'video/*';
+                    }
+                    
+                    // Reset any existing preview
+                    resetPostPreview();
+                });
+            });
+
+            // Content type selection for stories
+            document.querySelectorAll('#storyModal .content-type-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('#storyModal .content-type-option').forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    currentStoryContentType = option.dataset.type;
+                    
+                    // Update upload area text
+                    const uploadText = storyUploadArea.querySelector('p');
+                    if (currentStoryContentType === 'image') {
+                        uploadText.textContent = 'Click to upload an image';
+                        storyMediaInput.accept = 'image/*';
+                    } else {
+                        uploadText.textContent = 'Click to upload a video';
+                        storyMediaInput.accept = 'video/*';
+                    }
+                    
+                    // Reset any existing preview
+                    resetStoryPreview();
+                });
+            });
+
+            // Post media upload
+            postUploadArea.addEventListener('click', () => {
+                postMediaInput.click();
+            });
+
+            postMediaInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    selectedPostMediaFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        selectedPostMediaURL = e.target.result;
+                        postUploadArea.classList.add('has-image');
+                        
+                        if (currentPostContentType === 'image') {
+                            postUploadArea.innerHTML = `<img src="${selectedPostMediaURL}" class="preview-image" alt="Preview">`;
+                        } else {
+                            postUploadArea.innerHTML = `
+                                <video class="preview-video" controls>
+                                    <source src="${selectedPostMediaURL}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            `;
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Story media upload
+            storyUploadArea.addEventListener('click', () => {
+                storyMediaInput.click();
+            });
+
+            storyMediaInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    selectedStoryMediaFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        selectedStoryMediaURL = e.target.result;
+                        storyUploadArea.classList.add('has-image');
+                        
+                        if (currentStoryContentType === 'image') {
+                            storyUploadArea.innerHTML = `<img src="${selectedStoryMediaURL}" class="preview-image" alt="Preview">`;
+                        } else {
+                            storyUploadArea.innerHTML = `
+                                <video class="preview-video" controls>
+                                    <source src="${selectedStoryMediaURL}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            `;
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Form submissions
+            createPostForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await createPost();
+            });
+
+            createStoryForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await createStory();
+            });
+            
+            // Add event listeners for like buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('fa-heart')) {
+                    const heartIcon = e.target;
+                    heartIcon.classList.toggle('far');
+                    heartIcon.classList.toggle('fas');
+                    heartIcon.classList.toggle('liked');
+                    
+                    // Update like count in database
+                    const postElement = heartIcon.closest('.post');
+                    const postId = postElement.dataset.id;
+                    if (postId) {
+                        updateLikeCount(postId, heartIcon.classList.contains('fas'));
+                    }
+                }
+            });
+
+            // Add event listeners for bottom navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.id !== 'createPostBtn' && item.id !== 'createStoryBtn') {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.querySelectorAll('.nav-item').forEach(nav => {
+                            nav.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    });
+                }
+            });
+        }
+
+        // Reset post form
+        function resetPostForm() {
+            createPostForm.reset();
+            selectedPostMediaFile = null;
+            selectedPostMediaURL = null;
+            resetPostPreview();
+        }
+
+        // Reset story form
+        function resetStoryForm() {
+            createStoryForm.reset();
+            selectedStoryMediaFile = null;
+            selectedStoryMediaURL = null;
+            resetStoryPreview();
+        }
+
+        // Reset post preview
+        function resetPostPreview() {
+            postUploadArea.classList.remove('has-image');
+            const uploadText = currentPostContentType === 'image' ? 'Click to upload an image' : 'Click to upload a video';
+            postUploadArea.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>${uploadText}</p>
+            `;
+        }
+
+        // Reset story preview
+        function resetStoryPreview() {
+            storyUploadArea.classList.remove('has-image');
+            const uploadText = currentStoryContentType === 'image' ? 'Click to upload an image' : 'Click to upload a video';
+            storyUploadArea.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>${uploadText}</p>
+            `;
+        }
+
+        // Update like count in database
+        async function updateLikeCount(postId, isLiked) {
+            try {
+                const postRef = doc(db, 'posts', postId);
+                // In a real app, you would get the current likes and increment/decrement
+                // For simplicity, we're just toggling between two states
+                await updateDoc(postRef, {
+                    likes: isLiked ? 1 : 0
+                });
+            } catch (error) {
+                console.error('Error updating like count:', error);
+            }
+        }
+
+        // Create new post
+        async function createPost() {
+            const username = document.getElementById('username').value.trim();
+            const caption = document.getElementById('caption').value.trim();
+            const location = document.getElementById('location').value.trim();
+
+            if (!username || !caption || !selectedPostMediaFile) {
+                alert('Please fill in all required fields and select a media file');
+                return;
+            }
+
+            try {
+                postingOverlay.classList.add('active');
+
+                // Upload media to Firebase Storage
+                const fileExtension = selectedPostMediaFile.name.split('.').pop();
+                const storageRef = ref(storage, `posts/${Date.now()}_${username}.${fileExtension}`);
+                await uploadBytes(storageRef, selectedPostMediaFile);
+                const mediaURL = await getDownloadURL(storageRef);
+
+                // Generate random avatar for user
+                const avatarURL = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+
+                // Add post to Firestore
+                await addDoc(collection(db, 'posts'), {
+                    username: username,
+                    avatar: avatarURL,
+                    mediaUrl: mediaURL,
+                    type: currentPostContentType,
+                    caption: caption,
+                    location: location || null,
+                    likes: 0,
+                    comments: 0,
+                    timestamp: serverTimestamp()
+                });
+
+                // Close modal and reset form
+                postingOverlay.classList.remove('active');
+                postModal.classList.remove('active');
+                resetPostForm();
+
+                // Show success message
+                alert('Post shared successfully! 🎉');
+
+            } catch (error) {
+                console.error('Error creating post:', error);
+                postingOverlay.classList.remove('active');
+                alert('Error sharing post. Please try again.');
+            }
+        }
+
+        // Create new story
+        async function createStory() {
+            const username = document.getElementById('storyUsername').value.trim();
+
+            if (!username || !selectedStoryMediaFile) {
+                alert('Please fill in all required fields and select a media file');
+                return;
+            }
+
+            try {
+                postingOverlay.classList.add('active');
+
+                // Upload media to Firebase Storage
+                const fileExtension = selectedStoryMediaFile.name.split('.').pop();
+                const storageRef = ref(storage, `stories/${Date.now()}_${username}.${fileExtension}`);
+                await uploadBytes(storageRef, selectedStoryMediaFile);
+                const mediaURL = await getDownloadURL(storageRef);
+
+                // Generate random avatar for user
+                const avatarURL = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+
+                // Add story to Firestore
+                await addDoc(collection(db, 'stories'), {
+                    username: username,
+                    avatar: avatarURL,
+                    mediaUrl: mediaURL,
+                    type: currentStoryContentType,
+                    timestamp: serverTimestamp()
+                });
+
+                // Close modal and reset form
+                postingOverlay.classList.remove('active');
+                storyModal.classList.remove('active');
+                resetStoryForm();
+
+                // Show success message
+                alert('Story shared successfully! 🎉');
+
+            } catch (error) {
+                console.error('Error creating story:', error);
+                postingOverlay.classList.remove('active');
+                alert('Error sharing story. Please try again.');
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
