@@ -1087,6 +1087,20 @@
         let storyProgressInterval;
         let storyProgressBars = [];
 
+        // Debug function to check Firebase connection
+        async function checkFirebaseConnection() {
+            try {
+                console.log("Checking Firebase connection...");
+                const testQuery = query(collection(db, 'posts'));
+                const snapshot = await getDocs(testQuery);
+                console.log("Firebase connection successful!");
+                return true;
+            } catch (error) {
+                console.error("Firebase connection failed:", error);
+                return false;
+            }
+        }
+
         // Format timestamp
         function formatTime(timestamp) {
             if (!timestamp) return 'Just now';
@@ -1381,13 +1395,14 @@
         // Load stories from Firestore
         async function loadStories() {
             try {
+                console.log("Loading stories from Firestore...");
+                
                 // Only show stories from the last 24 hours
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
                 
                 const storiesQuery = query(
                     collection(db, 'stories'), 
-                    where('timestamp', '>=', yesterday),
                     orderBy('timestamp', 'desc')
                 );
                 
@@ -1395,8 +1410,14 @@
                 onSnapshot(storiesQuery, (snapshot) => {
                     const stories = [];
                     snapshot.forEach((doc) => {
-                        stories.push({ id: doc.id, ...doc.data() });
+                        const storyData = doc.data();
+                        // Filter stories from last 24 hours
+                        const storyDate = storyData.timestamp?.toDate();
+                        if (storyDate && storyDate > yesterday) {
+                            stories.push({ id: doc.id, ...storyData });
+                        }
                     });
+                    console.log(`Loaded ${stories.length} stories`);
                     currentStories = stories;
                     renderStories(stories);
                 }, (error) => {
@@ -1405,7 +1426,8 @@
                         <div class="no-content" style="margin: 10px;">
                             <i class="fas fa-exclamation-circle"></i>
                             <h3>Error Loading Stories</h3>
-                            <p>Please check your connection</p>
+                            <p>Please check your connection and Firebase configuration</p>
+                            <p>Error: ${error.message}</p>
                         </div>
                     `;
                 });
@@ -1416,6 +1438,7 @@
                         <i class="fas fa-exclamation-circle"></i>
                         <h3>Error Loading Stories</h3>
                         <p>Please check your Firebase configuration</p>
+                        <p>Error: ${error.message}</p>
                     </div>
                 `;
             }
@@ -1424,6 +1447,7 @@
         // Load posts from Firestore
         async function loadPosts() {
             try {
+                console.log("Loading posts from Firestore...");
                 const postsQuery = query(collection(db, 'posts'), orderBy('timestamp', 'desc'));
                 
                 // Real-time listener
@@ -1432,6 +1456,7 @@
                     snapshot.forEach((doc) => {
                         posts.push({ id: doc.id, ...doc.data() });
                     });
+                    console.log(`Loaded ${posts.length} posts`);
                     renderPosts(posts);
                 }, (error) => {
                     console.error('Error loading posts:', error);
@@ -1439,7 +1464,8 @@
                         <div class="no-content">
                             <i class="fas fa-exclamation-circle"></i>
                             <h3>Error Loading Posts</h3>
-                            <p>Please check your connection</p>
+                            <p>Please check your connection and Firebase configuration</p>
+                            <p>Error: ${error.message}</p>
                             <button onclick="location.reload()">Retry</button>
                         </div>
                     `;
@@ -1451,6 +1477,7 @@
                         <i class="fas fa-exclamation-circle"></i>
                         <h3>Error Loading Posts</h3>
                         <p>Please check your Firebase configuration</p>
+                        <p>Error: ${error.message}</p>
                         <button onclick="location.reload()">Retry</button>
                     </div>
                 `;
@@ -1458,9 +1485,34 @@
         }
 
         // Initialize the page
-        function init() {
-            loadStories();
-            loadPosts();
+        async function init() {
+            console.log("Initializing ProMingle...");
+            
+            // Check Firebase connection first
+            const isConnected = await checkFirebaseConnection();
+            
+            if (isConnected) {
+                loadStories();
+                loadPosts();
+            } else {
+                storiesContainer.innerHTML = `
+                    <div class="no-content" style="margin: 10px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Firebase Connection Failed</h3>
+                        <p>Please check your Firebase configuration and internet connection</p>
+                        <button onclick="location.reload()">Retry Connection</button>
+                    </div>
+                `;
+                
+                postsContainer.innerHTML = `
+                    <div class="no-content">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Firebase Connection Failed</h3>
+                        <p>Please check your Firebase configuration and internet connection</p>
+                        <button onclick="location.reload()">Retry Connection</button>
+                    </div>
+                `;
+            }
             
             // Modal controls
             createPostBtn.addEventListener('click', (e) => {
@@ -1738,7 +1790,7 @@
             } catch (error) {
                 console.error('Error creating post:', error);
                 postingOverlay.classList.remove('active');
-                alert('Error sharing post. Please try again.');
+                alert('Error sharing post. Please try again. Error: ' + error.message);
             }
         }
 
@@ -1783,7 +1835,7 @@
             } catch (error) {
                 console.error('Error creating story:', error);
                 postingOverlay.classList.remove('active');
-                alert('Error sharing story. Please try again.');
+                alert('Error sharing story. Please try again. Error: ' + error.message);
             }
         }
 
